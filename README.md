@@ -5,7 +5,7 @@ kratos new servicexxx
 
 cp kratos_init2.sh servicexxx && cp  main_init.sh servicexxx && cd servicexxx
 
-服务初始化脚本的参数必须使用 工程名称，大小写敏感
+脚本的参数必须使用 工程名称，大小写敏感
 
 ./kratos_init2.sh servicexxx
 
