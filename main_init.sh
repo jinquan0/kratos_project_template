@@ -21,6 +21,8 @@ sed -i 's/id, _ = os.Hostname()/ \
 
 
 sed -i 's/defer c.Close/ \
+    fmt.Printf("Consul Server -> %s\\n", ConsulAddress) \
+    fmt.Printf("Config Path -> %s\\n", ConsulKeyValuePath) \
     consulClient, err := api.NewClient(\&api.Config{ \
       Address: ConsulAddress, \
     }) \
@@ -43,9 +45,17 @@ sed -i "N; 10 a \"github.com/hashicorp/consul/api\"\n \
         // Consul service registry\n \
         consul_r \"github.com/go-kratos/kratos/contrib/registry/consul/v2\"\n \
         \"fmt\"\n \
-        \"$project/internal/service\"\n" cmd/$project/main.go
+        \"$project/internal/service\"\n \
+        \"$project/internal/server\"\n" cmd/$project/main.go
 
-sed -i 's/flag.StringVar/\/\/flag.StringVar/' cmd/$project/main.go
+sed -i 's/flag.StringVar/ \
+    \/\/ Consul Key\/Value(service configuration) \
+    flag.StringVar (\&ConsulAddress, "consul-server", "iconsul.supor.com:30058", "consul server, eg: --consul-server iconsul.supor.com:30058") \
+    flag.StringVar (\&ConsulKeyValuePath, "config-path", "app\/cart\/configs\/config.yaml", "config path, eg: --config-path app\/cart\/configs\/config.yaml") \
+    \n\/\/ Prometheus metrics. \
+    server.Http_prometheus_init() \n & /g' cmd/$project/main.go
+
+sed -i 's/flag.StringVar (\&flagconf/\/\/flag.StringVar (\&flagconf/' cmd/$project/main.go
 
 sed -i 's/return kratos.New/ \
     consulClient, err := api.NewClient(\&api.Config{ \
@@ -95,6 +105,47 @@ func MyConfigFromConsul(c config.Config) {
 }
 EOF
 
+sed -i 's/"github.com\/go-kratos\/kratos\/v2\/log"/ \
+    \/\/ Prometheus metrics \
+    "github.com\/prometheus\/client_golang\/prometheus" \
+    prom "github.com\/go-kratos\/kratos\/contrib\/metrics\/prometheus\/v2" \
+    "github.com\/go-kratos\/kratos\/v2\/middleware\/metrics" \
+    "github.com\/prometheus\/client_golang\/prometheus\/promhttp"\n\n &/g' internal/server/http.go
+
+sed -i 's/\/\/ NewHTTPServer new a HTTP server./ \
+\/\/ Prometheus metrics \
+var ( \
+    _metricSeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{ \
+        Namespace: "server", \
+        Subsystem: "requests", \
+        Name:      "duration_sec", \
+        Help:      "server requests duration(sec).", \
+        Buckets:   []float64{0.005, 0.01, 0.025, 0.05, 0.1, 0.250, 0.5, 1}, \
+    }, []string{"kind", "operation"}) \
+\
+    _metricRequests = prometheus.NewCounterVec(prometheus.CounterOpts{ \
+        Namespace: "client", \
+        Subsystem: "requests", \
+        Name:      "code_total", \
+        Help:      "The total number of processed requests", \
+    }, []string{"kind", "operation", "code", "reason"}) \
+) \
+\
+func Http_prometheus_init() { \
+    prometheus.MustRegister(_metricSeconds, _metricRequests) \
+}\n &/g' internal/server/http.go
+
+
+sed -i 's/recovery.Recovery(),/ & \
+    \/\/ Prometheus metrics \
+                metrics.Server( \
+                metrics.WithSeconds(prom.NewHistogram(_metricSeconds)), \
+                metrics.WithRequests(prom.NewCounter(_metricRequests)), \
+            ), \n /g' internal/server/http.go
+
+sed -i 's/srv := http.NewServer(opts...)/ & \
+    \n\/\/ Prometheus metrics route. \
+    srv.Handle("\/metrics", promhttp.Handler()) \n /g' internal/server/http.go
 
 
 fi
