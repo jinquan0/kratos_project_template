@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package api.mysvc1.v1;
+import "google/api/annotations.proto";
+
+option go_package = "mysvc1/api/mysvc1/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.mysvc1.v1";
+
+service Mysvc1 {
+  rpc ProcLogic (Request) returns (Reply)  {
+        option (google.api.http) = {
+                post: "/v1/mysvc1",
+                body: "*"
+        };
+    }
+}
+
+message Request {
+  int32 Id = 1;
+  string Name = 2;
+}
+
+message Reply {
+  string message = 1;
+}
