@@ -29,7 +29,7 @@ option java_multiple_files = true;
 option java_package = "api.$project.v1";
 
 service ${project^} {
-  rpc GetFrontMessage (GetFrontMessageRequest) returns (GetFrontMessageReply)  {
+    rpc AckToFrontService (RequestFromFrontService) returns (ReplyToFrontService)  {
         option (google.api.http) = {
                 get: "/v1/$project/user/{id}/{count}",
                 body: "*"
@@ -37,12 +37,12 @@ service ${project^} {
     }
 }
 
-message GetFrontMessageRequest {
+message RequestFromFrontService {
   int64 id = 1;
   int64 count = 2;
 }
 
-message GetFrontMessageReply {
+message ReplyToFrontService {
   repeated Message messages = 1;
 }
 
@@ -256,6 +256,14 @@ sed -i 's/recovery.Recovery(),/ & \
 sed -i 's/"github.com\/go-kratos\/kratos\/v2\/transport\/grpc"/ & \
         "github.com\/go-kratos\/kratos\/v2\/middleware" \
         "github.com\/go-kratos\/kratos\/v2\/middleware\/tracing" \n /g' internal/server/grpc.go
+
+sed -i 's/recovery.Recovery(),/ & \
+                        middleware.Chain( \
+                                tracing.Server(), \
+                        ),\n /g' internal/server/http.go
+sed -i 's/"github.com\/go-kratos\/kratos\/v2\/transport\/http"/ & \
+        "github.com\/go-kratos\/kratos\/v2\/middleware" \
+        "github.com\/go-kratos\/kratos\/v2\/middleware\/tracing" \n /g' internal/server/http.go
 
 ################################################################################################################
 
