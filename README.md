@@ -24,7 +24,6 @@ wget -O framework_init.sh https://raw.githubusercontent.com/jinquan0/kratos_proj
 vi framework_init.sh
 ```
 
-```protobuf
 syntax = "proto3";
 
 package api.$project.v1;
@@ -45,19 +44,19 @@ service ${project^} {
     }
 }
 
-message RequestFromFrontService {
+message ~~RequestFromFrontService~~ RequestFromClnt {
   string mykey = 1;
   int64 myvalue  = 2;
 }
 
-message ReplyToFrontService {
+message ~~ReplyToFrontService~~ ReplyToClnt {
   repeated Message messages = 1;
 }
 
 message Message {
   string content = 1;
 }
-```
+
 
 ```bash
 #Phase#4 生成kratos代码框架
