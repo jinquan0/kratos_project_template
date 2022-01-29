@@ -181,9 +181,9 @@ func MyConfigFromConsul(c config.Config) {
 
 func ParseRequestArgsToMap(req string) (map[string]string) {
 	// ----------------------------------------------------------------
-	r_kv_array, _ := regexp.Compile(`([^:]+):([^:]+)(?: |$)`)
-	r_kv, _ := regexp.Compile(`[^:]+`)
-	r_val,_ := regexp.Compile(`"\s*(.*?)\s*"`)
+	r_kv_array, _ := regexp.Compile(\`([^:]+):([^:]+)(?: |$)\`)
+	r_kv, _ := regexp.Compile(\`[^:]+\`)
+	r_val,_ := regexp.Compile(\`"\s*(.*?)\s*"\`)
 	// ----------------------------------------------------------------
 	
 	MKV := make(map[string]string, len(r_kv_array.FindAllString(req, -1)))
