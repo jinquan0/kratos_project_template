@@ -54,3 +54,8 @@ message ReplyToFrontService {
 message Message {
   string content = 1;
 }
+
+```bash
+#Phase#4 生成kratos代码框架
+./framework_init.sh testsvcxxx
+```
