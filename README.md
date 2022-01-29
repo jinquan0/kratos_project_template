@@ -37,17 +37,17 @@ option java_package = "api.$project.v1";
 service ${project^} {
     rpc ~~AckToFrontService~~ AckToClnt (~~RequestFromFrontService~~ RequestFromClnt) returns (~~ReplyToFrontService~~ ReplyToClnt)  {
         option (google.api.http) = {
-                get: "/v1/$project/user/{id}~~/{count}~~",
+                get: "/v1/$project/kv/{mykey}/{myvalue}",
 		or
-		post: "/v1/$project/user~~/{id}/{count}~~",
+		post: "/v1/$project/post_kv",
                 body: "*"
         };
     }
 }
 
 message RequestFromFrontService {
-  int64 id = 1;
-  ~~int64 count = 2;~~
+  string mykey = 1;
+  int64 myvalue  = 2;
 }
 
 message ReplyToFrontService {
