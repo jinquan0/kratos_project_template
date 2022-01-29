@@ -115,3 +115,8 @@ drwxr-xr-x 2 root root       22 Jan 29 15:29 .
 drwxr-xr-x 8 root root      265 Jan 29 15:27 ..
 -rwxr-xr-x 1 root root 19101612 Jan 29 15:29 fusetest
 ```
+
+# http通过Nginx Proxy发布
+```bash
+curl -XPOST -H "Content-Type:application/json" -d '{"mykey": "jinquan", "myvalue": 18}' -k https://fuse-test.supor.com/v1/demo0/post_kv
+```
