@@ -38,7 +38,7 @@ service ${project^} {
         option (google.api.http) = {
                 get: "/v1/$project/user/{id}~~/{count}~~",
 		or
-		post: "/v1/$project/user/~~{id}/{count}~~",
+		post: "/v1/$project/user~~/{id}/{count}~~",
                 body: "*"
         };
     }
