@@ -23,7 +23,7 @@ wget -O framework_init.sh https://raw.githubusercontent.com/jinquan0/kratos_proj
 #Phase#3 根据实际需求调整protobuf
 vi framework_init.sh
 ```
-```protobuf
+
 syntax = "proto3";
 
 package api.$project.v1;
@@ -54,4 +54,3 @@ message ReplyToFrontService {
 message Message {
   string content = 1;
 }
-```
