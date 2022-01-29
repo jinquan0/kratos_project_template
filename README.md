@@ -68,14 +68,36 @@ message Message {
 vi internal/service/testsvcxxx.go
 ```
 ```golang
+package service
+
+import (
+	"context"
+
+	pb "fusetest/api/fusetest/v1"
+
+	"fmt"
+)
+
+type FusetestService struct {
+	pb.UnimplementedFusetestServer
+}
+
+func NewFusetestService() *FusetestService {
+	return &FusetestService{}
+}
+
 func (s *FusetestService) AckToClnt(ctx context.Context, req *pb.RequestFromClnt) (*pb.ReplyToClnt, error) {
 	//return &pb.ReplyToClnt{}, nil
+
+	fmt.Println(req.String())
+	
 	res := &pb.ReplyToClnt{}
 	//for _, v := range BackendServiceReply.Messages {
 		res.Messages = append(res.Messages, &pb.Message{Content: "hello"})
 	//}
 	return res, nil
 }
+
 ```
 # 构建工程
 ```bash
