@@ -186,7 +186,7 @@ func ParseRequestArgsToMap(req string) (map[string]string) {
 	r_val,_ := regexp.Compile(`"\s*(.*?)\s*"`)
 	// ----------------------------------------------------------------
 	
-	MKV := make(map[string]string, len(r_kv_array.FindAllString(req.String(), -1)))
+	MKV := make(map[string]string, len(r_kv_array.FindAllString(req, -1)))
 
 	for idx,kv:=range r_kv_array.FindAllString(req, -1) { // string array
 		idx = idx // key-value pair index(integer)
