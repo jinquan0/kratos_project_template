@@ -12,7 +12,7 @@ bash <(curl -fsS https://raw.githubusercontent.com/jinquan0/kratos_project_templ
 ---------------------------------------------------------------------------------------------------------------------------
 ```
 
-或者自定义项目框架
+# 或者自定义项目框架
 ```bash
 #Phase#1 创建项目workspace
 kratos new testsvcxxx && cd testsvcxxx
