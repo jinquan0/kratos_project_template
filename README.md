@@ -76,27 +76,25 @@ package service
 import (
 	"context"
 
-	pb "fusetest/api/fusetest/v1"
-
-	"fmt"
+	pb "demo0/api/demo0/v1"
 )
 
-type FusetestService struct {
-	pb.UnimplementedFusetestServer
+type Demo0Service struct {
+	pb.UnimplementedDemo0Server
 }
 
-func NewFusetestService() *FusetestService {
-	return &FusetestService{}
+func NewDemo0Service() *Demo0Service {
+	return &Demo0Service{}
 }
 
-func (s *FusetestService) AckToClnt(ctx context.Context, req *pb.RequestFromClnt) (*pb.ReplyToClnt, error) {
+func (s *Demo0Service) AckToClnt(ctx context.Context, req *pb.RequestFromClnt) (*pb.ReplyToClnt, error) {
 	//return &pb.ReplyToClnt{}, nil
 
-	fmt.Println(req.String())
-	
+	map_req:=ParseRequestArgsToMap(req.String())
+
 	res := &pb.ReplyToClnt{}
 	//for _, v := range BackendServiceReply.Messages {
-		res.Messages = append(res.Messages, &pb.Message{Content: "hello"})
+		res.Messages = append(res.Messages, &pb.Message{Content: "Hello "+map_req["mykey"]+", you are "+map_req["myvalue"]})
 	//}
 	return res, nil
 }
