@@ -148,6 +148,7 @@ package service
 
 import(
     "fmt"
+    "regexp"
     "github.com/go-kratos/kratos/v2/config"
     // Add MySQL package
     // Add Redis package
@@ -176,6 +177,31 @@ func MyConfigFromConsul(c config.Config) {
 
     // Redis endpoint configuration
     // ... ...
+}
+
+func ParseRequestArgsToMap(req string) (map[string]string) {
+	// ----------------------------------------------------------------
+	r_kv_array, _ := regexp.Compile(`([^:]+):([^:]+)(?: |$)`)
+	r_kv, _ := regexp.Compile(`[^:]+`)
+	r_val,_ := regexp.Compile(`"\s*(.*?)\s*"`)
+	// ----------------------------------------------------------------
+	
+	MKV := make(map[string]string, len(r_kv_array.FindAllString(req.String(), -1)))
+
+	for idx,kv:=range r_kv_array.FindAllString(req, -1) { // string array
+		idx = idx // key-value pair index(integer)
+		// fmt.Println(reflect.TypeOf(kv)) // 'string' type
+		x:=r_kv.FindAllString(kv, -1) // [some_key "some_value"]
+		matches := r_val.FindAllStringSubmatch(x[1], -1)  // ["some_value" some_value]
+		if len(matches) > 0 {  // 0 or 1
+	    	// fmt.Println(matches[0][1])
+	      	MKV[x[0]] = matches[0][1]
+	    } else{
+	    	// fmt.Println(x[1])
+	    	MKV[x[0]] = x[1]
+	    }
+	}
+        return MKV
 }
 EOF
 
