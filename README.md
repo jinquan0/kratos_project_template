@@ -59,7 +59,20 @@ message Message {
 #Phase#4 生成kratos代码框架
 ./framework_init.sh testsvcxxx
 ```
-
+# 调整业务逻辑
+```bash
+vi internal/service/testsvcxxx.go
+```
+```golang
+func (s *FusetestService) AckToClnt(ctx context.Context, req *pb.RequestFromClnt) (*pb.ReplyToClnt, error) {
+	//return &pb.ReplyToClnt{}, nil
+	res := &pb.ReplyToClnt{}
+	//for _, v := range BackendServiceReply.Messages {
+		res.Messages = append(res.Messages, &pb.Message{Content: "hello"})
+	//}
+	return res, nil
+}
+```
 # 构建工程
 ```bash
 # 生成api
