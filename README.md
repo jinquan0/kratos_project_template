@@ -59,3 +59,19 @@ message Message {
 #Phase#4 生成kratos代码框架
 ./framework_init.sh testsvcxxx
 ```
+
+# 构建工程
+```bash
+# 生成api
+make api
+# 安装依赖package
+go mod tidy
+# 编译目标
+make build
+
+[root@infrago fusetest]# ls -la bin
+total 18656
+drwxr-xr-x 2 root root       22 Jan 29 15:29 .
+drwxr-xr-x 8 root root      265 Jan 29 15:27 ..
+-rwxr-xr-x 1 root root 19101612 Jan 29 15:29 fusetest
+```
