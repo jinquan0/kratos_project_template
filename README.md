@@ -37,6 +37,8 @@ service ${project^} {
     rpc ~~AckToFrontService~~ AckToClnt (~~RequestFromFrontService~~ RequestFromClnt) returns (~~ReplyToFrontService~~ ReplyToClnt)  {
         option (google.api.http) = {
                 get: "/v1/$project/user/{id}~~/{count}~~",
+		or
+		post: "/v1/$project/user/~~{id}/{count}~~",
                 body: "*"
         };
     }
