@@ -24,6 +24,7 @@ wget -O framework_init.sh https://raw.githubusercontent.com/jinquan0/kratos_proj
 vi framework_init.sh
 ```
 
+```protobuf
 syntax = "proto3";
 
 package api.$project.v1;
@@ -37,6 +38,8 @@ service ${project^} {
     rpc ~~AckToFrontService~~ AckToClnt (~~RequestFromFrontService~~ RequestFromClnt) returns (~~ReplyToFrontService~~ ReplyToClnt)  {
         option (google.api.http) = {
                 get: "/v1/$project/user/{id}~~/{count}~~",
+		or
+		post: "/v1/$project/user~~/{id}/{count}~~",
                 body: "*"
         };
     }
@@ -54,6 +57,7 @@ message ReplyToFrontService {
 message Message {
   string content = 1;
 }
+```
 
 ```bash
 #Phase#4 生成kratos代码框架
