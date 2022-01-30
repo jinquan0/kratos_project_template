@@ -131,5 +131,5 @@ drwxr-xr-x 8 root root      265 Jan 29 15:27 ..
 
 # http通过Nginx Proxy发布
 ```bash
-curl -XPOST -H "Content-Type:application/json" -d '{"mykey": "jinquan", "myvalue": 18}' -k https://fuse-test.supor.com/v1/demo0/post_kv
+curl -XPOST -H "Content-Type:application/json" -d '{"mykey": "jinquan", "myvalue_i": 123, "myvalue_f": 3.1415}' -k https://fuse-test.supor.com/v1/demo1/api_1
 ```
