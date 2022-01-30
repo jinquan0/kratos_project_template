@@ -208,30 +208,30 @@ func ParseRequestArgsToMap(req string) (map[string]string) {
         return MKV
 }
 
-func ArgsAutoType(arg string) interface{} {
+func ArgsAutoType(arg string) (interface{}, string) {
 
-	argument := strings.TrimSpace(arg)  // 删除字符串首尾的空格
+	arg_s := strings.TrimSpace(arg)  // 删除字符串首尾的空格
 
 	r_float64, _ := regexp.Compile(\`^-?([1-9]\d*\.\d*|0\.\d*[1-9]\d*|0?\.0+|0)$\`)
 	r_int64, _ := regexp.Compile(\`^-?[1-9]\d*$\`)
 
-	f_match := r_float64.MatchString(argument)		// true or false
-	i_match := r_int64.MatchString(argument)		// true or false
+	f_match := r_float64.MatchString(arg_s)		// true or false
+	i_match := r_int64.MatchString(arg_s)		// true or false
 
 	var err error
-	var N interface{}
+	var x interface{}
 	if f_match == true && i_match == false {
-		N, err = strconv.ParseFloat(argument, 64)
+		x, err = strconv.ParseFloat(arg_s, 64)
 	} else if f_match == false && i_match == true {
-		N, err = strconv.ParseInt(argument, 10, 64)
+		x, err = strconv.ParseInt(arg_s, 10, 64)
 	} else if f_match == false && i_match == false {
-		N = argument
+		x = arg_s
 	}
 
 	if err != nil {
-		return nil
+		return nil,""
 	} 
-	return N
+	return x, arg_s
 }
 
 func ArgsAutoPrint(argument interface{}) {
@@ -245,6 +245,7 @@ func ArgsAutoPrint(argument interface{}) {
 		fmt.Printf("%s\n", reflect.ValueOf(argument))
 	}
 }
+
 EOF
 
 #############################################################################################################################
