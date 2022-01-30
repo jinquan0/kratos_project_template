@@ -23,7 +23,7 @@ wget -O framework_init.sh https://raw.githubusercontent.com/jinquan0/kratos_proj
 #Phase#3 根据实际需求调整protobuf
 vi framework_init.sh
 ```
-
+```protobuf
 syntax = "proto3";
 
 package api.$project.v1;
@@ -55,7 +55,7 @@ message ReplyToClnt {
 message Message {
   string content = 1;
 }
-
+```
 
 ```bash
 #Phase#4 生成kratos代码框架
