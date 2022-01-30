@@ -37,6 +37,7 @@ service ${project^} {
     rpc AckToClnt  (RequestFromClnt) returns (ReplyToClnt)  {
         option (google.api.http) = {
                 post: "/v1/$project/api_1",
+		// 或者使用GET方法
 		get: "/v1/$project/api_1/{mykey}/{myvalue_i}/{myvalue_f}",
                 body: "*"
         };
