@@ -47,7 +47,7 @@ service ${project^} {
 message RequestFromClnt {
     string mykey = 1; 
     int64 myvalue_i = 2;
-    double myvalue_f = 3;
+    double myvalue_f = 3;  // protobuf中使用 double 表示float64
 }
 
 message ReplyToClnt {
