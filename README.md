@@ -95,13 +95,13 @@ func (s *Demo2Service) AckToClnt(ctx context.Context, req *pb.RequestFromClnt) (
 	f,f_str := ArgsAutoType(map_req["myvalue_f"])
 	
 	if S != nil {
-		fmt.Printf("mykey: %s\n", S.(string))
+		fmt.Printf("mykey: %s\n", S.(string))		//string 类型断言
 	}
 	if i != nil {
-		fmt.Printf("myvalue_i: %d\n", i.(int64))
+		fmt.Printf("myvalue_i: %d\n", i.(int64))	//int64 类型断言
 	}
 	if f != nil {
-		fmt.Printf("myvalue_f: %f\n", f.(float64))
+		fmt.Printf("myvalue_f: %f\n", f.(float64))	//float64 类型断言
 	}
 
 	res := &pb.ReplyToClnt{}
