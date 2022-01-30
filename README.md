@@ -72,27 +72,26 @@ package service
 import (
 	"context"
 
-	pb "demo1/api/demo1/v1"
-
+	pb "demo2/api/demo2/v1"
 	"fmt"
 )
 
-type Demo1Service struct {
-	pb.UnimplementedDemo1Server
+type Demo2Service struct {
+	pb.UnimplementedDemo2Server
 }
 
-func NewDemo1Service() *Demo1Service {
-	return &Demo1Service{}
+func NewDemo2Service() *Demo2Service {
+	return &Demo2Service{}
 }
 
-func (s *Demo1Service) AckToClnt(ctx context.Context, req *pb.RequestFromClnt) (*pb.ReplyToClnt, error) {
+func (s *Demo2Service) AckToClnt(ctx context.Context, req *pb.RequestFromClnt) (*pb.ReplyToClnt, error) {
 	//return &pb.ReplyToClnt{}, nil
 
 	map_req:=ParseRequestArgsToMap(req.String())
 
-	S:=ArgsAutoType(map_req["mykey"])
-	i:=ArgsAutoType(map_req["myvalue_i"])
-	f:=ArgsAutoType(map_req["myvalue_f"])
+	S,S_str := ArgsAutoType(map_req["mykey"])
+	i,i_str := ArgsAutoType(map_req["myvalue_i"])
+	f,f_str := ArgsAutoType(map_req["myvalue_f"])
 	
 	if S != nil {
 		fmt.Printf("mykey: %s\n", S.(string))
@@ -106,10 +105,11 @@ func (s *Demo1Service) AckToClnt(ctx context.Context, req *pb.RequestFromClnt) (
 
 	res := &pb.ReplyToClnt{}
 	//for _, v := range BackendServiceReply.Messages {
-		res.Messages = append(res.Messages, &pb.Message{Content: "Hello "+map_req["mykey"]+", you are "+map_req["myvalue_i"]})
+		res.Messages = append(res.Messages, &pb.Message{Content: "Hello "+ S_str +", you have "+i_str+" real numbers: "+f_str})
 	//}
 	return res, nil
 }
+
 
 
 ```
