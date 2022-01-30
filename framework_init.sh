@@ -29,20 +29,21 @@ option java_multiple_files = true;
 option java_package = "api.$project.v1";
 
 service ${project^} {
-    rpc AckToFrontService (RequestFromFrontService) returns (ReplyToFrontService)  {
+    rpc AckToClnt  (RequestFromClnt) returns (ReplyToClnt)  {
         option (google.api.http) = {
-                get: "/v1/$project/user/{id}/{count}",
+                post: "/v1/$project/api_1",
                 body: "*"
         };
     }
 }
 
-message RequestFromFrontService {
-  int64 id = 1;
-  int64 count = 2;
+message RequestFromClnt {
+    string mykey = 1; 
+    int64 myvalue_i = 2;
+    double myvalue_f = 3;
 }
 
-message ReplyToFrontService {
+message ReplyToClnt {
   repeated Message messages = 1;
 }
 
