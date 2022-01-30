@@ -36,9 +36,9 @@ option java_package = "api.$project.v1";
 service ${project^} {
     rpc AckToClnt  (RequestFromClnt) returns (ReplyToClnt)  {
         option (google.api.http) = {
-                post: "/v1/$project/api_1",
+                post: "/api/v1/$project",
 		// 或者使用GET方法
-		get: "/v1/$project/api_1/{mykey}/{myvalue_i}/{myvalue_f}",
+		get: "/api/v1/$project/{mykey}/{myvalue_i}/{myvalue_f}",
                 body: "*"
         };
     }
