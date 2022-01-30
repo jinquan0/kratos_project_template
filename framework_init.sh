@@ -149,6 +149,8 @@ package service
 import(
     "fmt"
     "regexp"
+    "strconv"
+    "reflect"
     "github.com/go-kratos/kratos/v2/config"
     // Add MySQL package
     // Add Redis package
@@ -202,6 +204,37 @@ func ParseRequestArgsToMap(req string) (map[string]string) {
 	    }
 	}
         return MKV
+}
+
+func ArgsAutoType(num string) interface{} {
+	r_float64, _ := regexp.Compile(\`^-?([1-9]\d*\.\d*|0\.\d*[1-9]\d*|0?\.0+|0)$\`)
+	r_int64, _ := regexp.Compile(\`^-?[0-9]\d*$\`)
+
+	f_match := r_float64.MatchString(num)	//true or false
+	i_match := r_int64.MatchString(num)		//true or false
+
+	var err error
+	var N interface{}
+	if f_match == true && i_match == false {
+		N, err = strconv.ParseFloat(num, 64)
+	} else if f_match == false && i_match == true {
+		N, err = strconv.ParseInt(num, 10, 64)
+	}
+
+	if err != nil {
+		return nil
+	} 
+	return N
+}
+
+func ArgsAutoPrint(num interface{}) {
+	// fmt.Println(reflect.TypeOf(num))
+	switch reflect.ValueOf(num).Kind() {
+	case reflect.Int64:
+		fmt.Printf("%d\n", reflect.ValueOf(num))
+	case reflect.Float64:
+		fmt.Printf("%f\n", reflect.ValueOf(num))
+	}
 }
 EOF
 
