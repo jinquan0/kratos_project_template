@@ -34,26 +34,21 @@ option java_multiple_files = true;
 option java_package = "api.$project.v1";
 
 service ${project^} {
-    rpc ~~AckToFrontService~~ AckToClnt (~~RequestFromFrontService~~ RequestFromClnt) returns (~~ReplyToFrontService~~ ReplyToClnt)  {
-       
-       option (google.api.http) = {
-                
-		get: "/v1/$project/kv/{mykey}/{myvalue}",
-		
-		post: "/v1/$project/post_kv",
-                
-		body: "*"
+    rpc AckToClnt  (RequestFromClnt) returns (ReplyToClnt)  {
+        option (google.api.http) = {
+                post: "/v1/$project/api_1",
+                body: "*"
         };
-	
     }
 }
 
-message ~~RequestFromFrontService~~ RequestFromClnt {
-  string mykey = 1;
-  int64 myvalue  = 2;
+message RequestFromClnt {
+    string mykey = 1; 
+    int64 myvalue_i = 2;
+    double myvalue_f = 3;
 }
 
-message ~~ReplyToFrontService~~ ReplyToClnt {
+message ReplyToClnt {
   repeated Message messages = 1;
 }
 
@@ -76,28 +71,45 @@ package service
 import (
 	"context"
 
-	pb "demo0/api/demo0/v1"
+	pb "demo1/api/demo1/v1"
+
+	"fmt"
 )
 
-type Demo0Service struct {
-	pb.UnimplementedDemo0Server
+type Demo1Service struct {
+	pb.UnimplementedDemo1Server
 }
 
-func NewDemo0Service() *Demo0Service {
-	return &Demo0Service{}
+func NewDemo1Service() *Demo1Service {
+	return &Demo1Service{}
 }
 
-func (s *Demo0Service) AckToClnt(ctx context.Context, req *pb.RequestFromClnt) (*pb.ReplyToClnt, error) {
+func (s *Demo1Service) AckToClnt(ctx context.Context, req *pb.RequestFromClnt) (*pb.ReplyToClnt, error) {
 	//return &pb.ReplyToClnt{}, nil
 
 	map_req:=ParseRequestArgsToMap(req.String())
 
+	S:=ArgsAutoType(map_req["mykey"])
+	i:=ArgsAutoType(map_req["myvalue_i"])
+	f:=ArgsAutoType(map_req["myvalue_f"])
+	
+	if S != nil {
+		fmt.Printf("mykey: %s\n", S.(string))
+	}
+	if i != nil {
+		fmt.Printf("myvalue_i: %d\n", i.(int64))
+	}
+	if f != nil {
+		fmt.Printf("myvalue_f: %f\n", f.(float64))
+	}
+
 	res := &pb.ReplyToClnt{}
 	//for _, v := range BackendServiceReply.Messages {
-		res.Messages = append(res.Messages, &pb.Message{Content: "Hello "+map_req["mykey"]+", you are "+map_req["myvalue"]})
+		res.Messages = append(res.Messages, &pb.Message{Content: "Hello "+map_req["mykey"]+", you are "+map_req["myvalue_i"]})
 	//}
 	return res, nil
 }
+
 
 ```
 # 构建工程
