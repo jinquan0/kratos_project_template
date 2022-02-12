@@ -81,6 +81,108 @@ cd cmd/$project/
 wire
 cd ../..
 
+########################################## other ############################################################
+
+sed -i "s/Name string/Name string = \"$project\"/" cmd/$project/main.go
+sed -i "s/Version string/Version string = \"1.0-alpha\"/" cmd/$project/main.go
+
+####################################################### My Own logic #############################################################
+cat << EOF > internal/service/mylogic.go
+package service
+
+import(
+    "fmt"
+    "regexp"
+    "strconv"
+    "strings"
+    "reflect"
+    "github.com/go-kratos/kratos/v2/config"
+    // Add MySQL package
+    // Add Redis package
+)
+
+var DbEndpoint struct {
+  Mysqlendpoint struct {
+    Host  string \`json:"host"\`
+    Port  string \`json:"port"\`
+    User  string \`json:"user"\`
+    Pass  string \`json:"pass"\`
+    Sslca string \`json:"sslca"\`
+  } \`json:"mysqlendpoint"\`
+}
+
+func MyDatabaseEndpoint(c config.Config) {
+    if err := c.Scan(&DbEndpoint); err != nil {
+        panic(err)
+    }
+    fmt.Printf("%+v\n", DbEndpoint)
+}
+
+func ParseRequestArgsToMap(req string) (map[string]string) {
+	// ----------------------------------------------------------------
+	r_kv_array, _ := regexp.Compile(\`([^:]+):([^:]+)(?: |$)\`)
+	r_kv, _ := regexp.Compile(\`[^:]+\`)
+	r_val,_ := regexp.Compile(\`"\s*(.*?)\s*"\`)
+	// ----------------------------------------------------------------
+	
+	MKV := make(map[string]string, len(r_kv_array.FindAllString(req, -1)))
+
+	for idx,kv:=range r_kv_array.FindAllString(req, -1) { // string array
+		idx = idx // key-value pair index(integer)
+		// fmt.Println(reflect.TypeOf(kv)) // 'string' type
+		x:=r_kv.FindAllString(kv, -1) // [some_key "some_value"]
+		matches := r_val.FindAllStringSubmatch(x[1], -1)  // ["some_value" some_value]
+		if len(matches) > 0 {  // 0 or 1
+	    	// fmt.Println(matches[0][1])
+	      	MKV[x[0]] = matches[0][1]
+	    } else{
+	    	// fmt.Println(x[1])
+	    	MKV[x[0]] = x[1]
+	    }
+	}
+        return MKV
+}
+
+func ArgsAutoType(arg string) (interface{}, string) {
+
+	arg_s := strings.TrimSpace(arg)  // 删除字符串首尾的空格
+
+	r_float64, _ := regexp.Compile(\`^-?([1-9]\d*\.\d*|0\.\d*[1-9]\d*|0?\.0+|0)$\`)
+	r_int64, _ := regexp.Compile(\`^-?[1-9]\d*$\`)
+
+	f_match := r_float64.MatchString(arg_s)		// true or false
+	i_match := r_int64.MatchString(arg_s)		// true or false
+
+	var err error
+	var x interface{}
+	if f_match == true && i_match == false {
+		x, err = strconv.ParseFloat(arg_s, 64)
+	} else if f_match == false && i_match == true {
+		x, err = strconv.ParseInt(arg_s, 10, 64)
+	} else if f_match == false && i_match == false {
+		x = arg_s
+	}
+
+	if err != nil {
+		return nil,""
+	} 
+	return x, arg_s
+}
+
+func ArgsAutoPrint(argument interface{}) {
+	// fmt.Println(reflect.TypeOf(argument))
+	switch reflect.ValueOf(argument).Kind() {
+	case reflect.Int64:
+		fmt.Printf("%d\n", reflect.ValueOf(argument))
+	case reflect.Float64:
+		fmt.Printf("%f\n", reflect.ValueOf(argument))
+	case reflect.String:
+		fmt.Printf("%s\n", reflect.ValueOf(argument))
+	}
+}
+
+EOF
+
 #############################################################################################################################
 
 cat << EOF > internal/server/jaeger_trace.go
@@ -166,6 +268,10 @@ sed -i 's/recovery.Recovery(),/ & \
 sed -i 's/"github.com\/go-kratos\/kratos\/v2\/transport\/http"/ & \
         "github.com\/go-kratos\/kratos\/v2\/middleware" \
         "github.com\/go-kratos\/kratos\/v2\/middleware\/tracing" \n /g' internal/server/http.go
+
+################################################################################################################
+
+
 
 ################################################################################################################
 
