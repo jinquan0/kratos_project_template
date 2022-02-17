@@ -1,6 +1,6 @@
 # kratos_project_template
 创建项目模版,
-脚本的参数必须使用 工程名称，大小写敏感
+脚本的参数必须使用 工程名称：大小写敏感 ；不能使用下划线_、短横线- ； 首字符必须小写字母； 首字符不能使用数字
 ```bash
 #Phase#1 创建项目workspace
 kratos new testsvcxxx && cd testsvcxxx
