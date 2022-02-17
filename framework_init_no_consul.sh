@@ -18,16 +18,15 @@ rm -rf internal/data/greeter.go
 
 echo "[`date +"%Y-%m-%d %H:%M:%S"`] Kratos generate protobuf template"
 kratos proto add api/$project/v1/$project.proto
+
+##---------------------------------------------------Service Template -----------------------------------------------------------
 cat << EOF > api/$project/v1/$project.proto
 syntax = "proto3";
-
 package api.$project.v1;
 import "google/api/annotations.proto";
-
 option go_package = "$project/api/$project/v1;v1";
 option java_multiple_files = true;
 option java_package = "api.$project.v1";
-
 service ${project^} {
     rpc AckToClnt  (RequestFromClnt) returns (ReplyToClnt)  {
         option (google.api.http) = {
@@ -36,23 +35,20 @@ service ${project^} {
         };
     }
 }
-
 message RequestFromClnt {
     string mykey = 1; 
     int64 myvalue_i = 2;
     double myvalue_f = 3;
 }
-
 message ReplyToClnt {
   repeated Message messages = 1;
 }
-
 message Message {
   string content = 1;
 }
 EOF
 #cat api/$project/v1/$project.proto
-
+##------------------------------------------------------------------------------------------------------------------------------
 
 echo "[`date +"%Y-%m-%d %H:%M:%S"`] Kratos generate server template"
 kratos proto server api/$project/v1/$project.proto -t internal/service
@@ -81,7 +77,7 @@ cd cmd/$project/
 wire
 cd ../..
 
-########################################## other ############################################################
+####################################################### Service version & name ###################################################
 
 sed -i "s/Name string/Name string = \"$project\"/" cmd/$project/main.go
 sed -i "s/Version string/Version string = \"1.0-alpha\"/" cmd/$project/main.go
@@ -89,7 +85,6 @@ sed -i "s/Version string/Version string = \"1.0-alpha\"/" cmd/$project/main.go
 ####################################################### My Own logic #############################################################
 cat << EOF > internal/service/mylogic.go
 package service
-
 import(
     "fmt"
     "regexp"
@@ -100,7 +95,6 @@ import(
     // Add MySQL package
     // Add Redis package
 )
-
 var DbEndpoint struct {
   Mysqlendpoint struct {
     Host  string \`json:"host"\`
@@ -110,14 +104,12 @@ var DbEndpoint struct {
     Sslca string \`json:"sslca"\`
   } \`json:"mysqlendpoint"\`
 }
-
 func MyDatabaseEndpoint(c config.Config) {
     if err := c.Scan(&DbEndpoint); err != nil {
         panic(err)
     }
     fmt.Printf("%+v\n", DbEndpoint)
 }
-
 func ParseRequestArgsToMap(req string) (map[string]string) {
 	// ----------------------------------------------------------------
 	r_kv_array, _ := regexp.Compile(\`([^:]+):([^:]+)(?: |$)\`)
@@ -126,7 +118,6 @@ func ParseRequestArgsToMap(req string) (map[string]string) {
 	// ----------------------------------------------------------------
 	
 	MKV := make(map[string]string, len(r_kv_array.FindAllString(req, -1)))
-
 	for idx,kv:=range r_kv_array.FindAllString(req, -1) { // string array
 		idx = idx // key-value pair index(integer)
 		// fmt.Println(reflect.TypeOf(kv)) // 'string' type
@@ -142,17 +133,12 @@ func ParseRequestArgsToMap(req string) (map[string]string) {
 	}
         return MKV
 }
-
 func ArgsAutoType(arg string) (interface{}, string) {
-
 	arg_s := strings.TrimSpace(arg)  // 删除字符串首尾的空格
-
 	r_float64, _ := regexp.Compile(\`^-?([1-9]\d*\.\d*|0\.\d*[1-9]\d*|0?\.0+|0)$\`)
 	r_int64, _ := regexp.Compile(\`^-?[1-9]\d*$\`)
-
 	f_match := r_float64.MatchString(arg_s)		// true or false
 	i_match := r_int64.MatchString(arg_s)		// true or false
-
 	var err error
 	var x interface{}
 	if f_match == true && i_match == false {
@@ -162,13 +148,11 @@ func ArgsAutoType(arg string) (interface{}, string) {
 	} else if f_match == false && i_match == false {
 		x = arg_s
 	}
-
 	if err != nil {
 		return nil,""
 	} 
 	return x, arg_s
 }
-
 func ArgsAutoPrint(argument interface{}) {
 	// fmt.Println(reflect.TypeOf(argument))
 	switch reflect.ValueOf(argument).Kind() {
@@ -180,18 +164,15 @@ func ArgsAutoPrint(argument interface{}) {
 		fmt.Printf("%s\n", reflect.ValueOf(argument))
 	}
 }
-
 EOF
 
-#############################################################################################################################
+########################################################## jaeger tracing ##########################################################
 
 cat << EOF > internal/server/jaeger_trace.go
 package server
-
 import (
     "fmt"
     "github.com/go-kratos/kratos/v2/config"
-
         "go.opentelemetry.io/otel"
         "go.opentelemetry.io/otel/attribute"
         "go.opentelemetry.io/otel/exporters/jaeger"
@@ -199,7 +180,6 @@ import (
         tracesdk "go.opentelemetry.io/otel/sdk/trace"
         semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
-
 var JaegerClient struct {
   Myjaeger struct {
     CollectorUrl  string \`json:"url"\`
@@ -209,14 +189,12 @@ var JaegerClient struct {
     AttrVal string \`json:"attrval"\`
   } \`json:"myjaeger"\`
 }
-
 func MyJaegerClient(c config.Config) {
     if err := c.Scan(&JaegerClient); err != nil {
         panic(err)
     }
     fmt.Printf("%+v\n", JaegerClient)
 }
-
 // set trace provider
 func setTracerProvider(url string, rate float64, service string, attrkey string, attrval string) error {
         // Create the Jaeger exporter
@@ -238,8 +216,6 @@ func setTracerProvider(url string, rate float64, service string, attrkey string,
         otel.SetTracerProvider(tp)
         return nil
 }
-
-
 func MyJaegerTraceProvider(c config.Config) {
         MyJaegerClient(c)
         err := setTracerProvider(JaegerClient.Myjaeger.CollectorUrl,
@@ -269,10 +245,127 @@ sed -i 's/"github.com\/go-kratos\/kratos\/v2\/transport\/http"/ & \
         "github.com\/go-kratos\/kratos\/v2\/middleware" \
         "github.com\/go-kratos\/kratos\/v2\/middleware\/tracing" \n /g' internal/server/http.go
 
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ CI/CD Resources ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mkdir -p $PWD/cicd
+
+cat << EOF > cicd/version
+1.0-alpha
+EOF
+
+cat << EOF > cicd/entrypoint.sh
+#!/bin/sh
+
+/app/$project -conf /app/config.yaml &
+/usr/sbin/sshd -f /etc/ssh/sshd_config
+tail -f /dev/null
+EOF
+
+cat << EOF > cicd/Dockerfile
+########################### Ultimate image ############################
+FROM aws-harbor.supor.com/bbconn/alpine:3.13
+
+##-> image's description & author
+MAINTAINER jinquan jinquan7@foxmail.com
+LABEL Description="kratos API service(Golang Project Name), Routine configuration file is /app/config.yaml "
+
+##-> copy executable objects to target image
+COPY ./bin/$project /app/$project
+COPY ./configs/config.yaml /app/config.yaml
+
+##-> copy app's other files to target image
+COPY ./cicd/version /app/
+
+ADD cicd/entrypoint.sh /usr/sbin/
+RUN chmod +x /usr/sbin/entrypoint.sh
+
+EXPOSE 22
+EXPOSE 8000
+EXPOSE 9000
+
+#VOLUME [ "/app/log" ]
+
+ENTRYPOINT ["/usr/sbin/entrypoint.sh"]
+EOF
+
+cat << EOF > cicd/$project.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "$project"
+  namespace: \$NAMESPACE
+spec:
+  minReadySeconds: 16
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "$project"
+  template:
+    metadata:
+      annotations:
+        proxy.istio.io/config: |
+          holdApplicationUntilProxyStarts: true
+      labels:
+        app: "$project"
+    spec:
+      terminationGracePeriodSeconds: 0
+      imagePullSecrets:
+      - name: aws-harbor
+      containers:
+      - name: $project
+        image: aws-harbor.supor.com/bbconn/$project:\$APP_VER
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        - containerPort: 9000
+        #env:
+        #  - name: ENV1_NAME
+        #    value: " "
+        #args: [" " , " "]
+
+        #livenessProbe:
+        #  httpGet:
+        #    path: /healthy
+        #    port: 9314
+        #  initialDelaySeconds: 10
+        #  periodSeconds: 3
+        #readinessProbe:
+        #  exec:
+        #    command:
+        #      - curl
+        #      - -XPOST -H "Content-Type:application/json" -d '{"mykey":"jinquan", "myvalue_i":100, "myvalue_f":3.1415}'
+        #      - http://localhost:8000/api/v1/$project
+        #  initialDelaySeconds: 5
+        #  timeoutSeconds: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: $project
+ namespace: \$NAMESPACE
+spec:
+  selector:
+    app: $project
+  ports:
+  - name: http
+    port: 8000
+    protocol: TCP
+    targetPort: 8000
+  - name: grpc
+    port: 9000
+    protocol: TCP
+    targetPort: 9000
+
+EOF
+
 ################################################################################################################
 
 
-
-################################################################################################################
 
 fi
