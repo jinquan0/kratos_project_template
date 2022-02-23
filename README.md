@@ -126,6 +126,7 @@ func (s *Demo2Service) AckToClnt(ctx context.Context, req *pb.RequestFromClnt) (
 # 构建工程
 ```bash
 # 生成api
+# 后续api更新、添加，调整api/$project/v1/$project.proto ,然后重新make api 即可
 make api
 # 安装依赖package
 go mod tidy
