@@ -126,7 +126,6 @@ func (s *Demo2Service) AckToClnt(ctx context.Context, req *pb.RequestFromClnt) (
 # 构建工程
 ```bash
 # 生成api
-# 后续api更新、添加，调整api/$project/v1/$project.proto ,然后重新make api 即可
 make api
 # 安装依赖package
 go mod tidy
@@ -138,6 +137,16 @@ total 18656
 drwxr-xr-x 2 root root       22 Jan 29 15:29 .
 drwxr-xr-x 8 root root      265 Jan 29 15:27 ..
 -rwxr-xr-x 1 root root 19101612 Jan 29 15:29 fusetest
+```
+# api后期变更流程
+```bash
+api更新、添加，需要调整protobuf 
+-->  vi api/$project/v1/$project.proto , 然后重新make api
+rm -rf go.mod go.sum
+go mod init $project_name
+go mod tidy
+make api
+make build
 ```
 
 # http通过Nginx Proxy发布
